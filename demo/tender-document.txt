@@ -1,0 +1,67 @@
+REQUEST FOR PROPOSAL (RFP)
+Software Development Services
+
+1. PROJECT OVERVIEW
+The client seeks proposals for the development of a comprehensive web-based application for tender management and analysis.
+
+2. ELIGIBILITY CRITERIA
+2.1 Company Registration
+- Valid company registration certificate
+- Minimum 3 years of operation
+- Good standing with regulatory authorities
+
+2.2 Financial Requirements
+- Financial statements for the last 3 years
+- Minimum annual turnover of $500,000
+- Positive cash flow for the last 2 years
+
+2.3 Technical Requirements
+- ISO 9001 certification
+- Minimum 5 years of experience in software development
+- At least 3 similar projects completed successfully
+- Team of minimum 5 developers with relevant experience
+
+2.4 Legal Requirements
+- Valid business license
+- Tax compliance certificate
+- No pending legal disputes
+
+3. TECHNICAL SPECIFICATIONS
+3.1 Technology Stack
+- Frontend: React.js or Angular
+- Backend: Node.js or Python
+- Database: PostgreSQL or MongoDB
+- Cloud hosting capability
+
+3.2 Functional Requirements
+- User authentication and authorization
+- Document upload and management
+- AI-powered analysis capabilities
+- Reporting and analytics
+- Mobile responsive design
+
+4. PROJECT TIMELINE
+- Project duration: 6 months
+- Phase 1: Requirements analysis and design (1 month)
+- Phase 2: Development (4 months)
+- Phase 3: Testing and deployment (1 month)
+
+5. EVALUATION CRITERIA
+- Technical approach (30%)
+- Experience and qualifications (25%)
+- Project timeline (20%)
+- Cost proposal (15%)
+- Support and maintenance (10%)
+
+6. SUBMISSION REQUIREMENTS
+- Technical proposal
+- Financial proposal
+- Company profile
+- Team resumes
+- Project portfolio
+- References from previous clients
+
+7. DEADLINE
+Proposals must be submitted by December 31, 2024.
+
+Contact: procurement@company.com 
