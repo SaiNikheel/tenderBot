@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, XCircle, AlertTriangle, Download, MessageCircle, ArrowLeft, ChevronDown, ChevronUp, TrendingUp, TrendingDown } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Download, MessageCircle, ArrowLeft, ChevronDown, ChevronUp, TrendingUp } from 'lucide-react';
 
 const ReportPage = ({ analysisResult, documents, onStartChat, onBackToUpload }) => {
   const [expandedSections, setExpandedSections] = useState({

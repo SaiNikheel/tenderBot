@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { Document, Page } from 'react-pdf';
 import { Loader2, CheckCircle, AlertCircle, FileText, BarChart3, Zap } from 'lucide-react';
 import apiService from '../services/api';
@@ -7,7 +7,6 @@ import apiService from '../services/api';
 const AnalysisPage = ({ documents, onAnalysisComplete, isAnalyzing, setIsAnalyzing }) => {
   const [analysisStep, setAnalysisStep] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [numPages, setNumPages] = useState({ tender: 0, proposal: 0 });
   const [error, setError] = useState(null);
 
   const analysisSteps = [
@@ -17,13 +16,7 @@ const AnalysisPage = ({ documents, onAnalysisComplete, isAnalyzing, setIsAnalyzi
     { id: 'analyzing', label: 'Generating analysis report', icon: CheckCircle }
   ];
 
-  useEffect(() => {
-    if (documents.tender && documents.proposal) {
-      startAnalysis();
-    }
-  }, [documents]);
-
-  const startAnalysis = async () => {
+  const startAnalysis = useCallback(async () => {
     setIsAnalyzing(true);
     setProgress(0);
     setAnalysisStep(0);
@@ -60,10 +53,17 @@ const AnalysisPage = ({ documents, onAnalysisComplete, isAnalyzing, setIsAnalyzi
       setError(error.message);
       setIsAnalyzing(false);
     }
-  };
+  }, [documents, analysisSteps.length, setIsAnalyzing, onAnalysisComplete]);
+
+  useEffect(() => {
+    if (documents.tender && documents.proposal) {
+      startAnalysis();
+    }
+  }, [documents, startAnalysis]);
 
   const onDocumentLoadSuccess = (type, { numPages }) => {
-    setNumPages(prev => ({ ...prev, [type]: numPages }));
+    // Store numPages if needed for future use
+    console.log(`${type} document has ${numPages} pages`);
   };
 
   return (

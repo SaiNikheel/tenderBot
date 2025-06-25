@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Send, Bot, User, ArrowLeft, FileText, MessageCircle } from 'lucide-react';
+import { Send, Bot, User, ArrowLeft, FileText } from 'lucide-react';
 import apiService from '../services/api';
 
 const ChatPage = ({ documents, analysisResult, onBackToReport }) => {
