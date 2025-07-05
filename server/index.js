@@ -23,6 +23,9 @@ app.use(cors({
       'https://tenderbot.vercel.app',
       'https://tenderbot-git-main.vercel.app',
       'https://tenderbot-git-develop.vercel.app',
+      'https://tender-bot-git-main-nikheels-projects.vercel.app',
+      'https://tender-bot.vercel.app',
+      'https://tenderbot-nikheels-projects.vercel.app',
       // Add your specific Vercel URLs here
       process.env.FRONTEND_URL
     ].filter(Boolean);
@@ -31,6 +34,7 @@ app.use(cors({
       callback(null, true);
     } else {
       console.log('CORS blocked origin:', origin);
+      console.log('Allowed origins:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -96,6 +100,11 @@ app.get('/health', (req, res) => {
         'http://localhost:3000',
         'http://localhost:3001',
         'https://tenderbot.vercel.app',
+        'https://tenderbot-git-main.vercel.app',
+        'https://tenderbot-git-develop.vercel.app',
+        'https://tender-bot-git-main-nikheels-projects.vercel.app',
+        'https://tender-bot.vercel.app',
+        'https://tenderbot-nikheels-projects.vercel.app',
         process.env.FRONTEND_URL
       ].filter(Boolean)
     }
