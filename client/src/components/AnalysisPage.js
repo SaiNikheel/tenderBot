@@ -23,28 +23,38 @@ const AnalysisPage = ({ documents, onAnalysisComplete, isAnalyzing, setIsAnalyzi
     setError(null);
 
     try {
-      // Simulate analysis steps with progress
+      // Start the actual API call immediately
+      const analysisPromise = apiService.analyzeDocuments(documents.tender, documents.proposal);
+      
+      // Simulate progress updates while the API is processing
       for (let i = 0; i < analysisSteps.length; i++) {
         setAnalysisStep(i);
         
-        // Simulate step duration
+        // Simulate step duration (shorter for better UX)
         await new Promise(resolve => {
-          const duration = 2000 + Math.random() * 1000; // 2-3 seconds per step
+          const duration = 1500 + Math.random() * 500; // 1.5-2 seconds per step
           const interval = setInterval(() => {
             setProgress(prev => {
-              const newProgress = prev + (100 / analysisSteps.length / 20);
+              const newProgress = prev + (100 / analysisSteps.length / 15);
               if (newProgress >= (i + 1) * (100 / analysisSteps.length)) {
                 clearInterval(interval);
                 resolve();
               }
               return newProgress;
             });
-          }, duration / 20);
+          }, duration / 15);
         });
       }
 
-      // Call the actual API
-      const result = await apiService.analyzeDocuments(documents.tender, documents.proposal);
+      // Wait for the actual API response
+      const result = await analysisPromise;
+      
+      // Ensure progress shows 100% completion
+      setProgress(100);
+      setAnalysisStep(analysisSteps.length - 1);
+      
+      // Small delay to show completion
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       setIsAnalyzing(false);
       onAnalysisComplete(result);

@@ -1,6 +1,28 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// Get API URL from environment or use a fallback
+const getApiUrl = () => {
+  const envUrl = process.env.REACT_APP_API_URL;
+  
+  if (envUrl) {
+    return envUrl;
+  }
+  
+  // Fallback logic for different environments
+  if (process.env.NODE_ENV === 'production') {
+    // In production, you need to set REACT_APP_API_URL environment variable
+    console.warn('REACT_APP_API_URL not set in production. Please configure your backend URL.');
+    return 'https://your-backend-domain.vercel.app'; // Replace with your actual backend URL
+  }
+  
+  // Development fallback
+  return 'http://localhost:8000';
+};
+
+const API_BASE_URL = getApiUrl();
+
+console.log('API Base URL:', API_BASE_URL);
+console.log('Environment:', process.env.NODE_ENV);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -10,7 +32,7 @@ const api = axios.create({
 // Request interceptor for adding auth headers if needed
 api.interceptors.request.use(
   (config) => {
-    // Add any auth headers here if needed
+    console.log('Making request to:', config.url);
     return config;
   },
   (error) => {
@@ -34,6 +56,9 @@ api.interceptors.response.use(
       return Promise.reject(new Error(message));
     } else if (error.request) {
       // Request was made but no response received
+      if (error.code === 'ERR_NETWORK' || error.message.includes('ERR_CONNECTION_REFUSED')) {
+        return Promise.reject(new Error(`Cannot connect to server at ${API_BASE_URL}. Please check if the backend server is running and the URL is correct.`));
+      }
       return Promise.reject(new Error('No response from server. Please check your connection.'));
     } else {
       // Something else happened

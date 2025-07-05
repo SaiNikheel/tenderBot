@@ -12,7 +12,30 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://tenderbot.vercel.app',
+      'https://tenderbot-git-main.vercel.app',
+      'https://tenderbot-git-develop.vercel.app',
+      // Add your specific Vercel URLs here
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
@@ -48,7 +71,35 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Routes
 app.get('/', (req, res) => {
-  res.json({ message: 'TenderBot API is running!' });
+  res.json({ 
+    message: 'TenderBot API is running!',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    version: '1.0.0',
+    endpoints: {
+      analyze: '/api/analyze',
+      chat: '/api/chat',
+      health: '/'
+    }
+  });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    geminiKey: process.env.GEMINI_API_KEY ? 'configured' : 'missing',
+    cors: {
+      allowedOrigins: [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'https://tenderbot.vercel.app',
+        process.env.FRONTEND_URL
+      ].filter(Boolean)
+    }
+  });
 });
 
 // Upload and analyze documents
@@ -135,7 +186,7 @@ async function analyzeDocuments(tenderText, proposalText) {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const prompt = `You are an expert tender document analyst with 15+ years of experience in procurement, compliance, and contract management. Your task is to perform a comprehensive analysis of a tender document against a proposal document.
+    const prompt = `You are TenderBot, an expert AI assistant specialized in tender document analysis with 15+ years of experience in procurement, compliance, and contract management. Your task is to perform a comprehensive analysis of a tender document against a proposal document.
 
 TENDER DOCUMENT CONTENT:
 ${tenderText.substring(0, 12000)}
@@ -146,32 +197,34 @@ ${proposalText.substring(0, 12000)}
 ANALYSIS REQUIREMENTS:
 
 1. COMPLIANCE VALIDATION:
-   - Technical requirements compliance
-   - Financial requirements compliance
-   - Legal and regulatory compliance
-   - Experience and qualification requirements
-   - Certification and accreditation requirements
-   - Insurance and liability requirements
+   - Technical requirements compliance (specifications, standards, methodologies)
+   - Financial requirements compliance (budget, pricing, financial capacity)
+   - Legal and regulatory compliance (licenses, permits, legal requirements)
+   - Experience and qualification requirements (past performance, team credentials)
+   - Certification and accreditation requirements (ISO, industry certifications)
+   - Insurance and liability requirements (coverage, limits, terms)
 
 2. DOCUMENT STRUCTURE ANALYSIS:
-   - Completeness of required sections
-   - Quality of technical approach
-   - Financial proposal adequacy
-   - Risk management approach
-   - Implementation methodology
-   - Quality assurance measures
+   - Completeness of required sections and submissions
+   - Quality and clarity of technical approach
+   - Financial proposal adequacy and competitiveness
+   - Risk management approach and mitigation strategies
+   - Implementation methodology and timeline
+   - Quality assurance measures and standards
 
 3. COMPETITIVE POSITIONING:
-   - Strengths of the proposal
+   - Strengths and unique selling propositions
    - Areas of competitive advantage
    - Potential weaknesses or gaps
    - Risk factors and mitigation strategies
+   - Innovation and value-added elements
 
 4. EVALUATION CRITERIA MATCHING:
    - Technical evaluation criteria alignment
    - Financial evaluation criteria compliance
    - Experience and past performance relevance
    - Innovation and value-added elements
+   - Risk assessment and management
 
 Provide your analysis in the following EXACT JSON format (no additional text, only valid JSON):
 
@@ -179,26 +232,26 @@ Provide your analysis in the following EXACT JSON format (no additional text, on
   "matches": [
     {
       "id": 1,
-      "requirement": "specific requirement name",
+      "requirement": "specific requirement name or criteria",
       "status": "matched",
-      "description": "detailed explanation of how this requirement is met",
-      "evidence": "specific evidence from the proposal",
+      "description": "detailed explanation of how this requirement is met with specific evidence",
+      "evidence": "specific evidence from the proposal document",
       "category": "technical|financial|legal|experience|certification|insurance"
     }
   ],
   "mismatches": [
     {
       "id": 1,
-      "requirement": "specific requirement name",
+      "requirement": "specific requirement name or criteria",
       "status": "missing|insufficient|non-compliant",
-      "description": "detailed explanation of the gap or deficiency",
+      "description": "detailed explanation of the gap, deficiency, or non-compliance",
       "impact": "high|medium|low",
       "category": "technical|financial|legal|experience|certification|insurance",
-      "recommendation": "specific action to address this gap"
+      "recommendation": "specific, actionable recommendation to address this gap"
     }
   ],
   "recommendations": [
-    "specific, actionable recommendation with priority level"
+    "specific, actionable recommendation with priority level and expected impact"
   ],
   "summary": {
     "totalRequirements": number,
@@ -209,23 +262,25 @@ Provide your analysis in the following EXACT JSON format (no additional text, on
     "competitivePosition": "strong|moderate|weak"
   },
   "detailedAnalysis": {
-    "technicalCompliance": "percentage and key findings",
-    "financialCompliance": "percentage and key findings",
-    "legalCompliance": "percentage and key findings",
-    "experienceCompliance": "percentage and key findings",
-    "overallAssessment": "comprehensive evaluation summary"
+    "technicalCompliance": "percentage and key findings with specific examples",
+    "financialCompliance": "percentage and key findings with specific examples",
+    "legalCompliance": "percentage and key findings with specific examples",
+    "experienceCompliance": "percentage and key findings with specific examples",
+    "overallAssessment": "comprehensive evaluation summary with strengths and areas for improvement"
   }
 }
 
 IMPORTANT GUIDELINES:
 - Be extremely specific and detailed in your analysis
-- Reference exact sections and requirements from both documents
-- Provide actionable, prioritized recommendations
-- Consider industry best practices and standards
-- Evaluate both compliance and competitive positioning
-- Focus on material requirements that affect evaluation scores
-- Consider risk factors and mitigation strategies
-- Provide evidence-based assessments`;
+- Reference exact sections, page numbers, and requirements from both documents
+- Provide actionable, prioritized recommendations with clear next steps
+- Consider industry best practices, standards, and regulatory requirements
+- Evaluate both compliance and competitive positioning objectively
+- Focus on material requirements that significantly affect evaluation scores
+- Consider risk factors, mitigation strategies, and contingency plans
+- Provide evidence-based assessments with specific examples
+- Ensure all numerical values are accurate and percentages are calculated correctly
+- Maintain professional tone and objective analysis throughout`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -256,7 +311,7 @@ async function generateChatResponse(message, context) {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const prompt = `You are TenderBot, an expert AI assistant specialized in tender document analysis with deep knowledge of procurement, compliance, and contract management.
+    const prompt = `You are TenderBot, an expert AI assistant specialized in tender document analysis with 15+ years of experience in procurement, compliance, and contract management.
 
 CONTEXT FROM PREVIOUS ANALYSIS:
 ${JSON.stringify(context, null, 2)}
@@ -264,23 +319,34 @@ ${JSON.stringify(context, null, 2)}
 USER QUESTION: ${message}
 
 INSTRUCTIONS:
-1. Answer the user's question based on the analysis context provided
-2. Use a professional, helpful tone
-3. Provide specific insights and actionable advice
-4. Reference specific data from the analysis when relevant
-5. If the question is about missing requirements, provide detailed explanations
-6. If the question is about recommendations, prioritize them by impact
-7. If the question is about compliance, explain the specific criteria
-8. If the question is unclear, ask for clarification
-9. Keep responses concise but comprehensive
-10. Use bullet points and formatting for clarity
+1. Answer the user's question based on the analysis context provided above
+2. Use a professional, helpful, and authoritative tone consistent with TenderBot's expertise
+3. Provide specific insights and actionable advice with clear next steps
+4. Reference specific data, percentages, and findings from the analysis when relevant
+5. If the question is about missing requirements, provide detailed explanations with impact assessment
+6. If the question is about recommendations, prioritize them by impact and provide implementation guidance
+7. If the question is about compliance, explain the specific criteria and evaluation standards
+8. If the question is about competitive positioning, provide strategic insights and improvement opportunities
+9. If the question is unclear or outside the scope, politely ask for clarification
+10. Keep responses concise but comprehensive, using bullet points and formatting for clarity
+11. Always maintain consistency with the analysis results and recommendations provided
+12. Provide evidence-based responses with specific examples from the analysis
 
 RESPONSE FORMAT:
-- Provide a clear, direct answer
-- Use specific examples from the analysis
+- Provide a clear, direct answer to the user's question
+- Use specific examples, numbers, and findings from the analysis
 - Include actionable recommendations when relevant
-- Reference specific requirements or criteria
-- Use professional formatting with bullet points where appropriate`;
+- Reference specific requirements, criteria, or sections from the documents
+- Use professional formatting with bullet points where appropriate
+- Maintain the same level of detail and expertise as the original analysis
+
+SPECIALIZED KNOWLEDGE AREAS:
+- Procurement processes and evaluation criteria
+- Compliance requirements and regulatory standards
+- Risk assessment and mitigation strategies
+- Competitive analysis and positioning
+- Technical and financial evaluation methods
+- Contract management and negotiation strategies`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;

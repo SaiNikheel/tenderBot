@@ -1,0 +1,111 @@
+#!/bin/bash
+
+echo "🚀 TenderBot Backend Deployment Helper"
+echo "======================================"
+
+echo ""
+echo "📋 Prerequisites:"
+echo "1. Google Gemini API key"
+echo "2. GitHub repository connected"
+echo "3. Node.js installed locally"
+echo ""
+
+echo "🌐 Choose your deployment platform:"
+echo "1. Render (Recommended - Free)"
+echo "2. Railway (Alternative - Free)"
+echo "3. Vercel (Alternative)"
+echo "4. Heroku (Paid)"
+echo ""
+
+read -p "Enter your choice (1-4): " choice
+
+case $choice in
+  1)
+    echo ""
+    echo "🎯 Deploying to Render..."
+    echo ""
+    echo "📝 Steps:"
+    echo "1. Go to https://render.com"
+    echo "2. Sign up/Login with GitHub"
+    echo "3. Click 'New Web Service'"
+    echo "4. Connect your repository"
+    echo "5. Configure:"
+    echo "   - Name: tenderbot-backend"
+    echo "   - Root Directory: server"
+    echo "   - Runtime: Node"
+    echo "   - Build Command: npm install"
+    echo "   - Start Command: npm start"
+    echo "6. Add Environment Variables:"
+    echo "   - GEMINI_API_KEY: your_api_key_here"
+    echo "   - NODE_ENV: production"
+    echo "7. Deploy and copy the URL"
+    echo ""
+    echo "🔗 After deployment, update your frontend:"
+    echo "   REACT_APP_API_URL=https://your-app.onrender.com"
+    ;;
+  2)
+    echo ""
+    echo "🎯 Deploying to Railway..."
+    echo ""
+    echo "📝 Steps:"
+    echo "1. Go to https://railway.app"
+    echo "2. Sign up/Login with GitHub"
+    echo "3. Click 'New Project'"
+    echo "4. Deploy from GitHub repo"
+    echo "5. Configure:"
+    echo "   - Root Directory: server"
+    echo "   - Build Command: npm install"
+    echo "   - Start Command: npm start"
+    echo "6. Add Environment Variables:"
+    echo "   - GEMINI_API_KEY: your_api_key_here"
+    echo "7. Deploy and copy the URL"
+    echo ""
+    echo "🔗 After deployment, update your frontend:"
+    echo "   REACT_APP_API_URL=https://your-app.railway.app"
+    ;;
+  3)
+    echo ""
+    echo "🎯 Deploying to Vercel..."
+    echo ""
+    echo "📝 Steps:"
+    echo "1. Go to https://vercel.com"
+    echo "2. New Project → Import your repository"
+    echo "3. Configure:"
+    echo "   - Root Directory: server"
+    echo "   - Build Command: npm install"
+    echo "   - Output Directory: server"
+    echo "4. Add Environment Variables:"
+    echo "   - GEMINI_API_KEY: your_api_key_here"
+    echo "5. Deploy and copy the URL"
+    echo ""
+    echo "🔗 After deployment, update your frontend:"
+    echo "   REACT_APP_API_URL=https://your-app.vercel.app"
+    ;;
+  4)
+    echo ""
+    echo "🎯 Deploying to Heroku..."
+    echo ""
+    echo "📝 Steps:"
+    echo "1. Install Heroku CLI: https://devcenter.heroku.com/articles/heroku-cli"
+    echo "2. Run: heroku login"
+    echo "3. Run: heroku create your-app-name"
+    echo "4. Run: heroku config:set GEMINI_API_KEY=your_api_key_here"
+    echo "5. Run: heroku config:set NODE_ENV=production"
+    echo "6. Run: git push heroku main"
+    echo ""
+    echo "🔗 After deployment, update your frontend:"
+    echo "   REACT_APP_API_URL=https://your-app-name.herokuapp.com"
+    ;;
+  *)
+    echo "❌ Invalid choice. Please run the script again."
+    exit 1
+    ;;
+esac
+
+echo ""
+echo "✅ After deployment:"
+echo "1. Test your backend URL: curl https://your-backend-url.com"
+echo "2. Update frontend environment variable"
+echo "3. Redeploy frontend"
+echo ""
+echo "🔧 Need help? Check QUICK_DEPLOYMENT_FIX.md" 
